@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="box">
+	<h1>Performance Review Reservamos</h1>
+    {% if not logged_in: %}
+      <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-large">Login</a>
+      <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block btn-large">Register</a>
+    {% else %}
+    <h1>Your answers have been published</h1>
+    {{url_for('home')}}
+
+
+
+
+    {% endif %}
+</div>
+
+{% endblock %}
