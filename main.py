@@ -15,18 +15,18 @@ from datetime import datetime, timezone
 import pytz
 from matplotlib import pyplot
 
-server = Flask(__name__)
+app = Flask(__name__)
 
-server.config['SECRET_KEY'] = 'any-secret-key-you-choose'
-server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(server)
-Bootstrap(server)
+app.config['SECRET_KEY'] = 'any-secret-key-you-choose'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+Bootstrap(app)
 
 # Configuring your Application
 # https://flask-login.readthedocs.io/en/latest/#configuring-your-application
 login_manager = LoginManager()
-login_manager.init_app(server)
+login_manager.init_app(app)
 
 
 @login_manager.user_loader
@@ -63,7 +63,7 @@ class Team(db.Model):
 db.create_all()
 
 
-@server.route('/')
+@app.route('/')
 def home():
     # Every render_template has a logged_in variable set.
     # para que si se borra la base de datos no falle:
@@ -74,7 +74,7 @@ def home():
         return render_template("index.html", logged_in=current_user.is_authenticated)
 
 
-@server.route('/register', methods=["GET", "POST"])
+@app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         if User.query.filter_by(email=request.form.get('email')).first():
@@ -102,7 +102,7 @@ def register():
     return render_template("register.html", logged_in=current_user.is_authenticated)
 
 
-@server.route('/login', methods=["GET", "POST"])
+@app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get('email')
@@ -130,7 +130,7 @@ class NameForm(FlaskForm):
     evaluated_person = SelectField('Name of the Evaluated person', choices=["☕️", "☕☕", "☕☕☕", "☕☕☕☕", "☕☕☕☕☕"], validators=[DataRequired()])
 
 
-@server.route('/secrets')
+@app.route('/secrets')
 @login_required
 def questions_by_area():
     name_evaluated = NameForm()
@@ -157,7 +157,7 @@ def questions_by_area():
         # print("Your email account is not added in the database, contact to the admin")
 
 
-@server.route("/home", methods=["GET", "POST"])
+@app.route("/home", methods=["GET", "POST"])
 def submit():
     if request.method == "POST":
         #with open("templates/strategist.html") as file:
@@ -221,14 +221,14 @@ def submit():
     return redirect(url_for('home'))
 
 
-@server.route('/report')
+@app.route('/report')
 @login_required
 def answer_database():
     answers_database = db.session.query(Team).all()
     return render_template('admin_list.html', user=current_user.email, options=answers_database)
 
 
-@server.route('/download', methods=["GET", "POST"])
+@app.route('/download', methods=["GET", "POST"])
 @login_required
 def get_answer_database():
     if request.method == "POST":
@@ -276,34 +276,11 @@ def get_answer_database():
         return render_template('download.html', person=chosen_person, options=answers_database)
 
 
-@server.route('/logout')
+@app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
-# Adding Dash
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-app = dash.Dash(__name__, server=server, routes_pathname_prefix='/')
 
-app.layout = html.Div(children=[
-        html.H1(children='Hello Dash'),
-        html.Div(children=''' Dash: A web app framework '''),
-        dcc.Graph(
-            id='example_graph',
-            figure={
-                'data': [
-                    {'x': [1,2,3], 'y': [4,1,2], 'type': 'bar', 'name': 'SF'},
-                    {'x': [1,2,3], 'y': [2,4,5], 'type': 'bar', 'name': u'Montréal'},
-                ],
-                'layout': {
-                    'title': 'Dash Data visualization'
-                }
-            }
-        )
-])
-
-if __name__ == "__main__":
-    app.run_server(debug=True)
-    #server.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
