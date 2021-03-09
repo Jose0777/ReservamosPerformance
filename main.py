@@ -15,18 +15,18 @@ from datetime import datetime, timezone
 import pytz
 from matplotlib import pyplot
 
-app = Flask(__name__)
+server = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'any-secret-key-you-choose'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-Bootstrap(app)
+server.config['SECRET_KEY'] = 'any-secret-key-you-choose'
+server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(server)
+Bootstrap(server)
 
 # Configuring your Application
 # https://flask-login.readthedocs.io/en/latest/#configuring-your-application
 login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager.init_app(server)
 
 
 @login_manager.user_loader
@@ -63,7 +63,7 @@ class Team(db.Model):
 db.create_all()
 
 
-@app.route('/')
+@server.route('/')
 def home():
     # Every render_template has a logged_in variable set.
     # para que si se borra la base de datos no falle:
@@ -74,7 +74,7 @@ def home():
         return render_template("index.html", logged_in=current_user.is_authenticated)
 
 
-@app.route('/register', methods=["GET", "POST"])
+@server.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         if User.query.filter_by(email=request.form.get('email')).first():
@@ -102,7 +102,7 @@ def register():
     return render_template("register.html", logged_in=current_user.is_authenticated)
 
 
-@app.route('/login', methods=["GET", "POST"])
+@server.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get('email')
@@ -130,7 +130,7 @@ class NameForm(FlaskForm):
     evaluated_person = SelectField('Name of the Evaluated person', choices=["☕️", "☕☕", "☕☕☕", "☕☕☕☕", "☕☕☕☕☕"], validators=[DataRequired()])
 
 
-@app.route('/secrets')
+@server.route('/secrets')
 @login_required
 def questions_by_area():
     name_evaluated = NameForm()
@@ -157,7 +157,7 @@ def questions_by_area():
         # print("Your email account is not added in the database, contact to the admin")
 
 
-@app.route("/home", methods=["GET", "POST"])
+@server.route("/home", methods=["GET", "POST"])
 def submit():
     if request.method == "POST":
         #with open("templates/strategist.html") as file:
@@ -221,14 +221,14 @@ def submit():
     return redirect(url_for('home'))
 
 
-@app.route('/report')
+@server.route('/report')
 @login_required
 def answer_database():
     answers_database = db.session.query(Team).all()
     return render_template('admin_list.html', user=current_user.email, options=answers_database)
 
 
-@app.route('/download', methods=["GET", "POST"])
+@server.route('/download', methods=["GET", "POST"])
 @login_required
 def get_answer_database():
     if request.method == "POST":
@@ -267,25 +267,43 @@ def get_answer_database():
         x = ["1", "2", "3"]
         y = [3, 5, 4]
         colors = ["blue", "red", "purple"]
-        pyplot.title("Performance")
-        pyplot.bar(x, height=y, color=colors, width=0.5)
-        pyplot.ylabel("Percentage")
-        pyplot.savefig("Performance.png")
-        pyplot.show()
+        #
+        # pyplot.title("Performance")
+        # pyplot.bar(x, height=y, color=colors, width=0.5)
+        # pyplot.ylabel("Percentage")
+        # pyplot.savefig("Performance.png")
+        # pyplot.show()
         return render_template('download.html', person=chosen_person, options=answers_database)
 
 
-@app.route('/logout')
+@server.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
+# Adding Dash
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+app = dash.Dash(__name__, server=server, routes_pathname_prefix='/')
 
-@app.route('/download')
-@login_required
-def download():
-    return send_from_directory("static", filename="files/cheat_sheet.pdf")
-
+app.layout = html.Div(children=[
+        html.H1(children='Hello Dash'),
+        html.Div(children=''' Dash: A web app framework '''),
+        dcc.Graph(
+            id='example_graph',
+            figure={
+                'data': [
+                    {'x': [1,2,3], 'y': [4,1,2], 'type': 'bar', 'name': 'SF'},
+                    {'x': [1,2,3], 'y': [2,4,5], 'type': 'bar', 'name': u'Montréal'},
+                ],
+                'layout': {
+                    'title': 'Dash Data visualization'
+                }
+            }
+        )
+])
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run_server(debug=True)
+    #server.run(debug=True)
