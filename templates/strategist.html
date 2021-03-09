@@ -15,7 +15,7 @@
 
     <fieldset>
       <legend>Evaluated Person:</legend>
-        <select name="name_person" id="pet-select">
+        <select name="name_person" id="pet-select" required>
           <option value="">--Please choose an option--</option>
           {% for index in people: %}
           <option value="{{ people[index]['name'] }}">{{ people[index]['name'] }}</option>
@@ -44,13 +44,13 @@
         <h1>Evaluación por Q's</h1>
         <p> Si eres líder de equipo ingresa la evaluación por Q's de la persona evaluada</p>
           <label for="Q1">Q1:</label>
-          <input type="text" id="Q1" name="Q1" placeholder="--">%<br>
+          <input type="number" step="any" id="Q1" name="Q1" placeholder="--">%<br>
           <label for="Q2">Q2:</label>
-          <input type="text" id="Q2" name="Q2" placeholder="--">%<br>
+          <input type="number" step="any" id="Q2" name="Q2" placeholder="--">%<br>
           <label for="Q3">Q3:</label>
-          <input type="text" id="Q3" name="Q3" placeholder="--">%<br>
+          <input type="number" step="any" id="Q3" name="Q3" placeholder="--">%<br>
           <label for="Q4">Q4:</label>
-          <input type="text" id="Q4" name="Q4" placeholder="--">%<br>
+          <input type="number" step="any" id="Q4" name="Q4" placeholder="--">%<br>
       </div>
       <button type="submit" class="btn btn-primary" id="send">Send</button>
     </fieldset>

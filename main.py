@@ -11,7 +11,9 @@ from people_dictionary import people
 from operation_data import question_operation
 from strategist_data import question_strategist
 from management_data import question_management
-
+from datetime import datetime, timezone
+import pytz
+from matplotlib import pyplot
 
 app = Flask(__name__)
 
@@ -50,16 +52,26 @@ class Team(db.Model):
     evaluated_person = db.Column(db.String(100))
     email_evaluator = db.Column(db.String(100), unique=False)
     answers = db.Column(db.String())
-    percentages = db.Column(db.String())
+    Q1 = db.Column(db.Float)
+    Q2 = db.Column(db.Float)
+    Q3 = db.Column(db.Float)
+    Q4 = db.Column(db.Float)
     category_answer = db.Column(db.String())
+    answer_date = db.Column(db.DateTime)
 
 # Line below only required once, when creating DB.
 db.create_all()
 
+
 @app.route('/')
 def home():
     # Every render_template has a logged_in variable set.
-    return render_template("index.html", logged_in=current_user.is_authenticated)
+    # para que si se borra la base de datos no falle:
+    if current_user.is_authenticated:
+        print(current_user.email)
+        return render_template("index.html", user=current_user.email, logged_in=current_user.is_authenticated)
+    else:
+        return render_template("index.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -166,47 +178,101 @@ def submit():
                 questions = question_strategist
             elif people[ind_]['category'] == "Direction":
                 questions = question_management
-            print(questions)
+            #print(questions)
             # considera un else break...
             for q_ in range(0, len(questions)):
                 if q_ % 3 == 0:
                     quest = questions[q_]["category"]
                     categories.append(quest)
-
         for index in range(1, len(form)-4):
             ind = "a"+str(index)
-            print(ind)
+            #print(ind)
             values.append(form[ind])
-
-        print(values)
-        # Answer in percentage
-        Q_ans = []
-        for index in range(1, 4+1):
-            ind = "Q"+str(index)
-            Q_ans.append(form[ind])
-        print(Q_ans)
+        #print(values)
+        q1 = form['Q1']
+        q2 = form['Q2']
+        q3 = form['Q3']
+        q4 = form['Q4']
+        if form['Q1'] == "":
+            q1 = 0
+        if form['Q2'] == "":
+            q2 = 0
+        if form['Q3'] == "":
+            q3 = 0
+        if form['Q4'] == "":
+            q4 = 0
+        tz = pytz.timezone('America/Monterrey')
+        monterrey_now = datetime.now(tz)
         new_answers = Team(
             evaluator=current_user.name,
             evaluated_person=str(form['name_person']),
             email_evaluator=current_user.email,
             answers=str(values),
-            percentages=str(Q_ans),
+            Q1=q1,
+            Q2=q2,
+            Q3=q3,
+            Q4=q4,
             category_answer=str(categories),
+            answer_date=monterrey_now,
         )
         db.session.add(new_answers)
         db.session.commit()
-        get_answer_database()
+        #get_answer_database()
     return redirect(url_for('home'))
 
 
-def get_answer_database():
+@app.route('/report')
+@login_required
+def answer_database():
     answers_database = db.session.query(Team).all()
-    print(answers_database)
-    for answer in answers_database:
-        ans = answer.answers
-        perc = answer.percentages
-        print(ans)
-        print(perc)
+    return render_template('admin_list.html', user=current_user.email, options=answers_database)
+
+
+@app.route('/download', methods=["GET", "POST"])
+@login_required
+def get_answer_database():
+    if request.method == "POST":
+        form = request.form
+        print(form)
+        chosen_person = form['person_id']
+        print(chosen_person)
+        answers_database = db.session.query(Team).all()
+        #print(answers_database)
+        for answer in answers_database:
+            ans = answer.answers.split(",")
+            ans = [s.replace("[", "") for s in ans]
+            ans = [s.replace("]", "") for s in ans]
+            ans = [s.replace(" ", "") for s in ans]
+            ans = [s.replace("'", "") for s in ans]
+            category = answer.category_answer.split(",")
+            category = [s.replace("[", "") for s in category]
+            category = [s.replace("]", "") for s in category]
+            #print(ans)
+            #print(category)
+            #print(answer.Q1)
+            #print(answer.Q2)
+            #print(type(answer.Q3))
+            ans_int = []
+            for n in range(0, len(ans)):
+                ans_ = int(n)
+                if ans_ == 1:
+                    ans_ = 0.25
+                elif ans_ == 2:
+                    ans_ = 0.5
+                elif ans_ == 3:
+                    ans_ = 0.75
+                elif ans_ == 4:
+                    ans_ = 1
+                ans_int.append(ans_)
+        x = ["1", "2", "3"]
+        y = [3, 5, 4]
+        colors = ["blue", "red", "purple"]
+        pyplot.title("Performance")
+        pyplot.bar(x, height=y, color=colors, width=0.5)
+        pyplot.ylabel("Percentage")
+        pyplot.savefig("Performance.png")
+        pyplot.show()
+        return render_template('download.html', person=chosen_person, options=answers_database)
 
 
 @app.route('/logout')

@@ -14,5 +14,10 @@
 
     {% endif %}
 </div>
+    {% if user=='edith@reservamos.mx' %}
+     <div>
+        <a class="btn btn-primary btn-large float-right" href="{{url_for('answer_database')}}">Results</a>
+    </div>
+    {% endif %}
 
 {% endblock %}

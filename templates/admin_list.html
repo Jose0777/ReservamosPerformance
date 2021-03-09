@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="box">
+	<h1>Reporte individual {{user}}</h1>
+    {% for person in options %}
+
+    <form action="{{url_for('get_answer_database')}}" method="POST">
+        <input class="btn-warning" type="submit" name="person_id" value="{{person.evaluated_person}}" />
+    </form>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
