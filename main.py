@@ -126,43 +126,22 @@ def login():
             return redirect(url_for('questions_by_area'))
 
     return render_template("login.html", logged_in=current_user.is_authenticated)
-
-
-class NameForm(FlaskForm):
-    evaluated_person = SelectField('Name of the Evaluated person', choices=["☕️", "☕☕", "☕☕☕", "☕☕☕☕", "☕☕☕☕☕"], validators=[DataRequired()])
+# class NameForm(FlaskForm):
+#     evaluated_person = SelectField('Name of the Evaluated person',
+#     choices=["☕️", "☕☕", "☕☕☕", "☕☕☕☕", "☕☕☕☕☕"], validators=[DataRequired()])
 
 
 @app.route('/secrets')
 @login_required
 def questions_by_area():
-    #name_evaluated = NameForm()
-    ind_ = []
-    questions = ""
-    # print(current_user.name)
-    # find the indx in the dictionary of the person logged in
-    for index in people:
-        if people[index]['email'] == current_user.email:
-            ind_ = index
-    # print(ind_)
-    if ind_:
-        print(people[ind_]['category'])
-        if people[ind_]['category'] == "Operation":
-            print("Operation questions")
-            questions = question_operation
-        elif people[ind_]['category'] == "Strategist":
-            print("Strategist questions")
-            questions = question_strategist
-            return render_template("strategist.html", email=current_user.email, name=current_user.name, questions=questions,
-                                   people=people, logged_in=True)
-        elif people[ind_]['category'] == "Direction":
-            print("Direction questions")
-            questions = question_management
-    # else:
-        # print("Your email account is not added in the database, contact to the admin")
+    return render_template("strategist.html", email=current_user.email, name=current_user.name,
+                           questions_operation=question_operation, questions_strategist=question_strategist,
+                           questions_management=question_management, people=people, logged_in=True)
 
 
 @app.route("/home", methods=["GET", "POST"])
 def submit():
+    print("hola")
     if request.method == "POST":
         #with open("templates/strategist.html") as file:
         #    contents = file.read()
@@ -175,6 +154,7 @@ def submit():
         ind_ = []
         questions = ""
         person_evaluated = str(form['name_person'])
+        print(person_evaluated)
         for index in people:
             if people[index]['email'] == current_user.email:
                 ind_ = index
