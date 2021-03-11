@@ -14,6 +14,7 @@ from management_data import question_management
 from datetime import datetime, timezone
 import pytz
 from matplotlib import pyplot
+import numpy as np
 
 app = Flask(__name__)
 
@@ -58,6 +59,7 @@ class Team(db.Model):
     Q4 = db.Column(db.Float)
     category_answer = db.Column(db.String())
     answer_date = db.Column(db.DateTime)
+    leader = db.Column(db.String(100))
 
 # Line below only required once, when creating DB.
 db.create_all()
@@ -112,7 +114,7 @@ def login():
         user = User.query.filter_by(email=email).first()
         # Email doesn't exist
         if not user:
-            flash("That email does not exist, please try again.")
+            flash("That email does not exist, please try again or register.")
             return redirect(url_for('login'))
         # Password incorrect
         elif not check_password_hash(user.password, password):
@@ -133,7 +135,9 @@ class NameForm(FlaskForm):
 @app.route('/secrets')
 @login_required
 def questions_by_area():
-    name_evaluated = NameForm()
+    #name_evaluated = NameForm()
+    ind_ = []
+    questions = ""
     # print(current_user.name)
     # find the indx in the dictionary of the person logged in
     for index in people:
@@ -148,8 +152,8 @@ def questions_by_area():
         elif people[ind_]['category'] == "Strategist":
             print("Strategist questions")
             questions = question_strategist
-            return render_template("strategist.html", name=current_user.name, questions=questions,
-                                   form_person=name_evaluated, people=people, logged_in=True)
+            return render_template("strategist.html", email=current_user.email, name=current_user.name, questions=questions,
+                                   people=people, logged_in=True)
         elif people[ind_]['category'] == "Direction":
             print("Direction questions")
             questions = question_management
@@ -167,10 +171,15 @@ def submit():
         values = []
         categories = []
         form = request.form
-        print(form)
+        leader_person = ""
+        ind_ = []
+        questions = ""
+        person_evaluated = str(form['name_person'])
         for index in people:
             if people[index]['email'] == current_user.email:
                 ind_ = index
+        #    if people[index]['name'] == person_evaluated:
+        #        leader_person = people[index]['leader']
         if ind_:
             if people[ind_]['category'] == "Operation":
                 questions = question_operation
@@ -182,13 +191,14 @@ def submit():
             # considera un else break...
             for q_ in range(0, len(questions)):
                 if q_ % 3 == 0:
-                    quest = questions[q_]["category"]
+                    quest = questions[q_]["category"] # Compromiso Org., Pensamiento Anal.
                     categories.append(quest)
+        # answer of the questions ans can be (0 -> 4)
         for index in range(1, len(form)-4):
             ind = "a"+str(index)
-            #print(ind)
-            values.append(form[ind])
-        #print(values)
+            values.append(int(form[ind]))
+        # example of working with matrix using numpy:
+        # print(np.array(values)*2)
         q1 = form['Q1']
         q2 = form['Q2']
         q3 = form['Q3']
@@ -205,7 +215,7 @@ def submit():
         monterrey_now = datetime.now(tz)
         new_answers = Team(
             evaluator=current_user.name,
-            evaluated_person=str(form['name_person']),
+            evaluated_person=person_evaluated,
             email_evaluator=current_user.email,
             answers=str(values),
             Q1=q1,
@@ -214,6 +224,7 @@ def submit():
             Q4=q4,
             category_answer=str(categories),
             answer_date=monterrey_now,
+            leader=current_user.name#leader_person
         )
         db.session.add(new_answers)
         db.session.commit()
@@ -225,7 +236,7 @@ def submit():
 @login_required
 def answer_database():
     answers_database = db.session.query(Team).all()
-    return render_template('admin_list.html', user=current_user.email, options=answers_database)
+    return render_template('admin_list.html', logged_in=current_user.is_authenticated, user=current_user.email, options=answers_database)
 
 
 @app.route('/download', methods=["GET", "POST"])
@@ -233,47 +244,69 @@ def answer_database():
 def get_answer_database():
     if request.method == "POST":
         form = request.form
-        print(form)
         chosen_person = form['person_id']
         print(chosen_person)
         answers_database = db.session.query(Team).all()
-        #print(answers_database)
-        for answer in answers_database:
-            ans = answer.answers.split(",")
-            ans = [s.replace("[", "") for s in ans]
-            ans = [s.replace("]", "") for s in ans]
-            ans = [s.replace(" ", "") for s in ans]
-            ans = [s.replace("'", "") for s in ans]
-            category = answer.category_answer.split(",")
-            category = [s.replace("[", "") for s in category]
-            category = [s.replace("]", "") for s in category]
-            #print(ans)
-            #print(category)
-            #print(answer.Q1)
-            #print(answer.Q2)
-            #print(type(answer.Q3))
-            ans_int = []
-            for n in range(0, len(ans)):
-                ans_ = int(n)
-                if ans_ == 1:
-                    ans_ = 0.25
-                elif ans_ == 2:
-                    ans_ = 0.5
-                elif ans_ == 3:
-                    ans_ = 0.75
-                elif ans_ == 4:
-                    ans_ = 1
-                ans_int.append(ans_)
-        x = ["1", "2", "3"]
-        y = [3, 5, 4]
-        colors = ["blue", "red", "purple"]
-        #
+        stored_answers = []
+        # evalua cuando los resultados de cuando la persona aparece en la db
+        for person in answers_database:
+            if chosen_person == person.evaluated_person:
+                # print(answers_database)
+                ans = person.answers
+                ans = ans.replace(' ', '')
+                ans = ans.replace("'", "")
+                ans = ans.replace("[", "")
+                ans = ans.replace("]", "")
+                ans = ans.split(",") # convert the string to an array
+                # array of number for answer:
+                ans_array = [int(numeric_string) for numeric_string in ans] #convert to an array of numbers
+                # conversion of answer to percentage:
+                ans_conversion = []
+                for n_ans in range(0, len(ans_array)):
+                    ans_ = ans_array[n_ans]
+                    if ans_ == 1:
+                        ans_ = 25
+                    elif ans_ == 2:
+                        ans_ = 50
+                    elif ans_ == 3:
+                        ans_ = 75
+                    elif ans_ == 4:
+                        ans_ = 100
+                    ans_conversion.append(ans_)
+                stored_answers.append(ans_conversion)
+                category = person.category_answer.split(",")
+                category = [s.replace("[", "") for s in category]
+                category = [s.replace("]", "") for s in category]
+                category = [s.replace("'", "") for s in category]
+        print(stored_answers)
+        # average of array: https://stackoverflow.com/questions/2153444/python-finding-average-of-a-nested-list/2157646
+        answers_mean = np.mean(stored_answers, axis=0)
+        # cada 3 respuestas me debe dar una gráfica, entonces hay que promediar cada 3 respuestas:
+        print(answers_mean)
+        x_ans = []
+        for i in range(0, len(answers_mean)):
+            if (i+1)%3 == 0:
+                elem_mean = np.mean(answers_mean[i-2:i+1])
+                x_ans.append(elem_mean) # almacena promed. cada 3 elements (el num de preguntas deben ser múltiplo de 3)
+        x_ans = np.round(x_ans, decimals=2)
+        print(x_ans)
+        # remove the space before and after each element of the category
+        for elem in range(0, len(category)):
+            category[elem] = category[elem].strip()
+        y_ans = category
+        print(y_ans)
+        #print(answer.Q1)
+        #print(answer.Q2)
+        #print(type(answer.Q3))
+        # x = ["1", "2", "3"]
+        # y = [3, 5, 4]
+        # colors = ["blue", "red", "purple"]
         # pyplot.title("Performance")
         # pyplot.bar(x, height=y, color=colors, width=0.5)
         # pyplot.ylabel("Percentage")
         # pyplot.savefig("Performance.png")
         # pyplot.show()
-        return render_template('download.html', person=chosen_person, options=answers_database)
+        return render_template('download.html', logged_in=current_user.is_authenticated, person=chosen_person, options=answers_database, x_values=x_ans, y_values=y_ans)
 
 
 @app.route('/logout')

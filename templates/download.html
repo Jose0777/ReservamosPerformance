@@ -1,13 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="box">
-	<h1>Reporte individual</h1>
-    <p>{{person}}</p>
-    <p>Criterios de Evaluación Reservamos</p>
+<div class="report">
+	<h3>REPORTE INDIVIDUAL {{person}}</h3><br>
+    <h3>Criterios de Evaluación Reservamos</h3> <br>
     <p>El Performance Review  está dividido en dos áreas claves que en total suman un 100%.</p>
-    <p style="color: white">RESULTADOS POR COMPETENCIAS</p>
 
+<div class="graph" style="background-color: white">
+    <h1>Resultados por competencias</h1>
+    <center>
+        <canvas id="chart" width="400" height="400"></canvas>
+        <script>
+            // bar chart data
+            var barData = {
+                labels : [
+                {% for item in y_values %}
+                    "{{ item }}",
+                {% endfor %}
+                ],
+                datasets : [{
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                data : [
+                    {% for item in x_values %}
+                        "{{ item }}",
+                    {% endfor %}
+	            ]
+                }]
+            }
+
+            // get bar chart canvas
+            var mychart = document.getElementById("chart").getContext("2d");
+
+            steps = 10
+            max = 100
+
+            // draw bar chart
+            new Chart(mychart).Bar(barData, {
+                scaleOverride: true,
+                scaleSteps: steps,
+                scaleStepWidth: Math.ceil(max / steps),
+                scaleStartValue: 0,
+                scaleShowVerticalLines: true,
+                scaleShowGridLines : true,
+                barShowStroke : true,
+                scaleShowLabels: true
+            });
+        </script>
+    </center>
+</div>
+    <br>
 </div>
 
 {% endblock %}
