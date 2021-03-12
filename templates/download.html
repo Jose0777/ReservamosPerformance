@@ -5,6 +5,40 @@
 	<h3>REPORTE INDIVIDUAL {{person}}</h3><br>
     <h3>Criterios de Evaluación Reservamos</h3> <br>
     <p>El Performance Review  está dividido en dos áreas claves que en total suman un 100%.</p>
+    <h2>Performance Review:</h2>
+        <ol>Competencias: 30%</ol>
+        <ol>Logro de OKR's: 70%</ol>
+        <ol> Total: 100%</ol>
+    <div>
+        Escala que mide los resultados:
+        <p> Red 0 - 49.9 % </p>
+        <p> Yellow 50 - 80.9 % </p>
+        <p> Green 81 - 100 %</p>
+        <p> Blue > 100 % </p>
+    </div>
+    <div class="center">
+        PONDERACIÓN DE RESULTADOS COMPETENCIAS Y OKRs
+        Total Ponderado: OKR  + Competencias
+        Escala:  81% - 100% Cumple con las expectativas
+        <div class="center">
+            <table class="center">
+                <thead>
+                <tr>
+                    <th>Resultado de OKRs</th>
+                    <th>Autoevaluación Competencias</th>
+                    <th>Evaluación del equipo (Competencias)</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tr>
+                    <td>{{result_okr}} %</td>
+                    <td>{{self_evaluation}} %</td>
+                    <td>{{team_evaluation}} %</td>
+                    <td>{{total_evaluation}} %</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
 <div class="graph" style="background-color: white">
     <h1>Resultados por competencias</h1>
@@ -13,31 +47,25 @@
         <script>
             // bar chart data
             var barData = {
-                labels : [
-                {% for item in y_values %}
+                labels : [ {% for item in y_values %}
                     "{{ item }}",
-                {% endfor %}
-                ],
+                {% endfor %} ],
                 datasets : [{
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
+                fillColor: "purple",
+                strokeColor: "purple",
                 pointColor: "rgba(151,187,205,1)",
-                data : [
-                    {% for item in x_values %}
+                data : [ {% for item in x_values %}
                         "{{ item }}",
-                    {% endfor %}
-	            ]
-                }]
+                    {% endfor %} ]
+                }],
             }
-
             // get bar chart canvas
             var mychart = document.getElementById("chart").getContext("2d");
-
             steps = 10
             max = 100
-
-            // draw bar chart
+            // draw bar chart   https://www.sitepoint.com/fancy-responsive-charts-with-chart-js/
             new Chart(mychart).Bar(barData, {
+                responsive: true,
                 scaleOverride: true,
                 scaleSteps: steps,
                 scaleStepWidth: Math.ceil(max / steps),
@@ -45,7 +73,19 @@
                 scaleShowVerticalLines: true,
                 scaleShowGridLines : true,
                 barShowStroke : true,
-                scaleShowLabels: true
+                scaleShowLabels: true,
+                scaleFontSize : 12,
+                scaleLineColor : 'black',
+                scaleGridLineColor: 'gray',
+                pointDotRadius: 10,
+                bezierCurve: false,
+                tooltipTitleFontStyle : 'normal',
+                barThickness: 18,
+                scales: {
+                      xAxes: [{
+                        maxBarThickness: 100,
+                      }],
+                }
             });
         </script>
     </center>
