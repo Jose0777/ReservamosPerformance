@@ -1,0 +1,203 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function(){
+    $("#name-person").hide()
+  });
+</script>
+<div class="container">
+  <h1 class="title">Welcome, {{name}}! </h1>
+
+  <div class="col-lg-8 col-md-10 mx-auto ">
+
+  <form action="{{url_for('submitted')}}" method="POST">
+    <fieldset>
+
+      {% if area == "engineer" %}
+        {% if category == "Operation" %}
+        <div id="question_operation_engineer">
+        {% for question in questions_operation_engineer %}
+        {% if (question['id']==1) or (question['id']-1)%3 == 0: %}
+        <br>
+        <legend> {{question['category']}} </legend>
+        <br>
+        {% endif %}
+        <legend>{{question['id']}}.- {{ question['question'] }}</legend>
+        <div class="question">
+          <input type="radio" name="a{{question['id']}}" value="0" required>Totalmente en Desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="1" required>En desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="2" required>Neutro
+          <input type="radio" name="a{{question['id']}}" value="3" required>De acuerdo
+          <input type="radio" name="a{{question['id']}}" value="4" required>Totalmente de acuerdo
+          <br>
+        </div>
+        {% endfor %}
+        </div>
+        <br>
+        {% endif %}
+
+        {% if category == "Strategist" %}
+        <div id="question_strategist_engineer">
+        {% for question in questions_strategist_engineer %}
+        {% if (question['id']==1) or (question['id']-1)%3 == 0: %}
+        <br>
+        <legend> {{question['category']}} </legend>
+        <br>
+        {% endif %}
+        <legend>{{question['id']}}.- {{ question['question'] }}</legend>
+        <div class="question">
+          <input type="radio" name="a{{question['id']}}" value="0" required>Totalmente en Desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="1" required>En desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="2" required>Neutro
+          <input type="radio" name="a{{question['id']}}" value="3" required>De acuerdo
+          <input type="radio" name="a{{question['id']}}" value="4" required>Totalmente de acuerdo
+          <br>
+        </div>
+        {% endfor %}
+        </div>
+        <br>
+        {% endif %}
+
+        {% if category == "Direction" %}
+        <div id="question_management_engineer">
+        {% for question in questions_management_engineer %}
+        {% if (question['id']==1) or (question['id']-1)%3 == 0: %}
+        <br>
+        <legend> {{question['category']}} </legend>
+        <br>
+        {% endif %}
+        <legend>{{question['id']}}.- {{ question['question'] }}</legend>
+        <div class="question">
+          <input type="radio" name="a{{question['id']}}" value="0" required>Totalmente en Desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="1" required>En desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="2" required>Neutro
+          <input type="radio" name="a{{question['id']}}" value="3" required>De acuerdo
+          <input type="radio" name="a{{question['id']}}" value="4" required>Totalmente de acuerdo
+          <br>
+        </div>
+        {% endfor %}
+        </div>
+        <br>
+        {% endif %}
+
+        {% if name_evaluator == leader_person %}
+          <div class="evaluation_by_cycles">
+            <h1>Evaluación por Ciclos</h1>
+            <p> Si eres líder de equipo ingresa la evaluación por ciclos de la persona evaluada</p>
+              <label for="C1">C1:</label>
+              <input type="number" step="any" id="C1" name="C1" placeholder="--">%<br>
+              <label for="C2">C2:</label>
+              <input type="number" step="any" id="C2" name="C2" placeholder="--">%<br>
+              <label for="C3">C3:</label>
+              <input type="number" step="any" id="C3" name="C3" placeholder="--">%<br>
+              <label for="C4">C4:</label>
+              <input type="number" step="any" id="C4" name="C4" placeholder="--">%<br>
+              <label for="C5">C5:</label>
+              <input type="number" step="any" id="C5" name="C5" placeholder="--">%<br>
+              <label for="C6">C6:</label>
+              <input type="number" step="any" id="C6" name="C6" placeholder="--">%<br>
+              <label for="C7">C7:</label>
+              <input type="number" step="any" id="C7" name="C7" placeholder="--">%<br>
+              <label for="C8">C8:</label>
+              <input type="number" step="any" id="C8" name="C8" placeholder="--">%<br>
+          </div>
+        {% endif %}
+
+      {% elif area != "engineer" %}
+
+        {% if category == "Operation" %}
+        <div id="question_operation">
+        {% for question in questions_operation %}
+        {% if (question['id']==1) or (question['id']-1)%3 == 0: %}
+        <br>
+        <legend> {{question['category']}} </legend>
+        <br>
+        {% endif %}
+        <legend>{{question['id']}}.- {{ question['question'] }}</legend>
+        <div class="question">
+          <input type="radio" name="a{{question['id']}}" value="0" required>Totalmente en Desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="1" required>En desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="2" required>Neutro
+          <input type="radio" name="a{{question['id']}}" value="3" required>De acuerdo
+          <input type="radio" name="a{{question['id']}}" value="4" required>Totalmente de acuerdo
+          <br>
+        </div>
+        {% endfor %}
+        </div>
+        <br>
+        {% endif %}
+
+        {% if category == "Strategist" %}
+        <div id="question_strategist">
+        {% for question in questions_strategist %}
+        {% if (question['id']==1) or (question['id']-1)%3 == 0: %}
+        <br>
+        <legend> {{question['category']}} </legend>
+        <br>
+        {% endif %}
+        <legend>{{question['id']}}.- {{ question['question'] }}</legend>
+        <div class="question">
+          <input type="radio" name="a{{question['id']}}" value="0" required>Totalmente en Desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="1" required>En desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="2" required>Neutro
+          <input type="radio" name="a{{question['id']}}" value="3" required>De acuerdo
+          <input type="radio" name="a{{question['id']}}" value="4" required>Totalmente de acuerdo
+          <br>
+        </div>
+        {% endfor %}
+        </div>
+        <br>
+        {% endif %}
+
+        {% if category == "Direction" %}
+        <div id="question_management">
+        {% for question in questions_management %}
+        {% if (question['id']==1) or (question['id']-1)%3 == 0: %}
+        <br>
+        <legend> {{question['category']}} </legend>
+        <br>
+        {% endif %}
+        <legend>{{question['id']}}.- {{ question['question'] }}</legend>
+        <div class="question">
+          <input type="radio" name="a{{question['id']}}" value="0" required>Totalmente en Desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="1" required>En desacuerdo
+          <input type="radio" name="a{{question['id']}}" value="2" required>Neutro
+          <input type="radio" name="a{{question['id']}}" value="3" required>De acuerdo
+          <input type="radio" name="a{{question['id']}}" value="4" required>Totalmente de acuerdo
+          <br>
+        </div>
+        {% endfor %}
+        </div>
+        <br>
+        {% endif %}
+
+        {% if name_evaluator == leader_person %}
+          <div class="evaluation_by_Q">
+            <h1>Evaluación por Q's</h1>
+            <p> Si eres líder de equipo ingresa la evaluación por Q's de la persona evaluada</p>
+              <label for="Q1">Q1:</label>
+              <input type="number" step="any" id="Q1" name="Q1" placeholder="--">%<br>
+              <label for="Q2">Q2:</label>
+              <input type="number" step="any" id="Q2" name="Q2" placeholder="--">%<br>
+              <label for="Q3">Q3:</label>
+              <input type="number" step="any" id="Q3" name="Q3" placeholder="--">%<br>
+              <label for="Q4">Q4:</label>
+              <input type="number" step="any" id="Q4" name="Q4" placeholder="--">%<br>
+          </div>
+        {% endif %}
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary" id="send">Send</button>
+      <div id="name-person">
+        <p> The evaluated person is: </p>
+        <input name="name_person" value="{{name_evaluated}}" selected>
+      </div>
+    </fieldset>
+  </form>
+    <br>
+    </div>
+
+</div>
+{% endblock %}
