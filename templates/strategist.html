@@ -3,7 +3,7 @@
 {% block content %}
 {% if not logged_in: %}
 <div class="box">
-	<h1>Performance Review Reservamos</h1>
+	<h1 id="title">Performance Review Reservamos</h1>
       <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-large">Login</a>
       <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block btn-large">Register</a>
 </div>
@@ -18,8 +18,7 @@
   {% endif %}
 </div>
   <div class="col-lg-8 col-md-10 mx-auto center">
-    <img src="https://assets-fl.reservamos.mx/assets/logo-b09feb00a641615eb083fedea266d68ed48e1e46687e198437b7a1aab251860d.svg">
-    <h1>Performance Review Reservamos</h1>
+      <h1>Performance Review Reservamos</h1>
       <p>Start Evaluating a team member</p>
     <form action="{{url_for('submit')}}" method="POST">
       <fieldset>

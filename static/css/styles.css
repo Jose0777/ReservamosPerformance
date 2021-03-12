@@ -141,3 +141,9 @@ td {
 .center {
     text-align:center;
 }
+.title {
+    color: white;
+}
+#title {
+    color: white;
+}

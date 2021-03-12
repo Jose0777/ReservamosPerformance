@@ -111,7 +111,7 @@ def register():
         )
         new_user = User(
         email=request.form.get("email"),
-        name=request.form.get("name"),
+        name=(request.form.get("name")).title(),
         password = hash_and_salted_password,
         )
         db.session.add(new_user)
@@ -119,7 +119,7 @@ def register():
         # Log in and authenticate user after adding details to database
         login_user(new_user)
 
-        return redirect(url_for("login"))
+        return redirect(url_for("questions_by_area"))
 
     return render_template("register.html", logged_in=current_user.is_authenticated)
 

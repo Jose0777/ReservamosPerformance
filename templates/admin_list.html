@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 
+<h1 class="title">Resultados Reporte Individual</h1>
+
 <div class="box">
-	<h1>Reporte individual {{user}}</h1>
     {% for person in options %}
 
     <form action="{{url_for('get_answer_database')}}" method="POST">
