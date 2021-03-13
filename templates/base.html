@@ -13,7 +13,7 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light navbar-text-color">
   <a class="navbar-brand" href="/">
       <img src="https://assets-fl.reservamos.mx/assets/logo-b09feb00a641615eb083fedea266d68ed48e1e46687e198437b7a1aab251860d.svg"> </a>
   <div class="collapse navbar-collapse">
@@ -29,7 +29,12 @@
         <a class="nav-link" href="{{ url_for('register') }}">Register</a>
       </li>
         {% endif %}
-<li class="nav-item">
+        {% if user=='edith@reservamos.mx' %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('answer_database') }}">Resultados</a>
+      </li>
+        {% endif %}
+      <li class="nav-item">
         <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
       </li>
     </ul>

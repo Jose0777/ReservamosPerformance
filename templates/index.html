@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
 
+<h1 class="main-title">Performance Review Reservamos</h1>
+{% if not logged_in: %}
 <div class="box">
-	<h1>Performance Review Reservamos</h1>
-    {% if not logged_in: %}
       <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-large">Login</a>
       <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block btn-large">Register</a>
-    {% else %}
-    <h2>Start evaluating a team member</h2>
-    <div>
-        <a class="btn btn-primary btn-large float-right" href="{{url_for('questions_by_area')}}">Start</a>
-    </div>
-
-    {% endif %}
 </div>
+{% else %}
+<br>
+<div class="box">
+    <h1>
+        <a class="btn btn-primary btn-large float-center" href="{{url_for('questions_by_area')}}">Start Evaluation</a>
+    </h1>
+</div>
+{% endif %}
+
 
 {% endblock %}

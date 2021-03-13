@@ -1,38 +1,33 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% extends "base.html" %}
 {% block content %}
-{% if not logged_in: %}
-<div class="box">
-	<h1 id="title">Performance Review Reservamos</h1>
-      <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-large">Login</a>
-      <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block btn-large">Register</a>
-</div>
-{% else %}
 
-<div class="center">
-  <h1 class="title">Welcome, {{name}}! </h1>
-  {% if user=='edith@reservamos.mx' %}
-     <div>
-        <a class="btn btn-primary btn-large float-right" href="{{url_for('answer_database')}}">Results</a>
-    </div>
-  {% endif %}
-</div>
-  <div class="col-lg-8 col-md-10 mx-auto center">
-      <h1>Performance Review Reservamos</h1>
-      <p>Start Evaluating a team member</p>
-    <form action="{{url_for('submit')}}" method="POST">
-      <fieldset>
-        <legend>Evaluated Person:</legend>
-          <select name="name_person" id="name-select" onchange="javascript:this.form.submit()" required>
-            <option value="">--Please choose an option--</option>
-            {% for index in people: %}
-            <option value="{{ people[index]['name'] }}">{{ people[index]['name'] }}</option>
-            {% endfor %}
-          </select>
-      </fieldset>
-    </form>
-    <br>
-  </div>
 
-{% endif %}
+    <h1 class="main-title">Performance Review Reservamos</h1>
+    {% if not logged_in: %}
+        <div class="box">
+              <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-large">Login</a>
+              <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block btn-large">Register</a>
+        </div>
+    {% else %}
+        <div class="main-title">
+        <h3 class="welcome"> Welcome, {{name}}!<br>Start Evaluating a team member</h3><br>
+
+        <form action="{{url_for('submit')}}" method="POST">
+          <fieldset>
+            <legend>Choose the name of the evaluated Person</legend>
+              <select name="name_person" id="name-select" onchange="javascript:this.form.submit()" required>
+                <option value=""> -- Please choose an option -- </option>
+                {% for index in people: %}
+                <option value="{{ people[index]['name'] }}">{{ people[index]['name'] }}</option>
+                {% endfor %}
+              </select>
+          </fieldset>
+        </form>
+            </div>
+    {% endif %}
+
+
+
+
 {% endblock %}

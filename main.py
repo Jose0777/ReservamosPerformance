@@ -168,7 +168,7 @@ def submit():
                                questions_management=question_management, questions_operation_engineer=question_operation_engineer,
                                questions_strategist_engineer=question_strategist_engineer, questions_management_engineer=question_management_engineer, people=people, logged_in=True,
                                name_evaluated=name_evaluated, category=category, area=area, leader_person=leader_person,
-                               name_evaluator=name_evaluator)
+                               name_evaluator=name_evaluator, user=current_user.email)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -336,7 +336,7 @@ def answer_database():
     for n_options in answers_database:
         names.append(n_options.evaluated_person)
     my_name_list = list(set(names)) # get list with no duplicated names
-    return render_template('admin_list.html', logged_in=current_user.is_authenticated, user=current_user.email,
+    return render_template('link_Results.html', logged_in=current_user.is_authenticated, user=current_user.email,
                            options=my_name_list)
 
 
@@ -459,7 +459,8 @@ def get_answer_database():
         # pyplot.show()
         return render_template('download.html', logged_in=current_user.is_authenticated, person=chosen_person,
                                options=answers_database, x_values=x_ans, y_values=y_ans, team_evaluation=team_evaluation,
-                               result_okr=result_okr, self_evaluation=self_evaluation, total_evaluation=total_evaluation)
+                               result_okr=result_okr, self_evaluation=self_evaluation, total_evaluation=total_evaluation,
+                               user=current_user.email,)
 
 
 @app.route('/logout')

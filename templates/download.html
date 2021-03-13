@@ -1,33 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="report">
-	<h3>REPORTE INDIVIDUAL {{person}}</h3><br>
-    <h3>Criterios de Evaluación Reservamos</h3> <br>
+<div class="container-questions">
+	<h3 class="main-title">Reporte Individual - {{person}}</h3><br>
+    <h2>Criterios de Evaluación Reservamos</h2> <br>
     <p>El Performance Review  está dividido en dos áreas claves que en total suman un 100%.</p>
-    <h2>Performance Review:</h2>
-        <ol>Competencias: 30%</ol>
-        <ol>Logro de OKR's: 70%</ol>
-        <ol> Total: 100%</ol>
+    <h3>Performance Review:</h3>
+        <table class="clasification-performance">
+            <tr>
+                <td><ol>Competencias: 30%</ol></td>   <td><ol>Logro de OKR's: 70%</ol></td>   <td><ol> Total: 100%</ol></td>
+            </tr>
+        </table>
+
     <div>
-        Escala que mide los resultados:
+        <h3>Escala que mide los resultados:</h3>
         <p> Red 0 - 49.9 % </p>
         <p> Yellow 50 - 80.9 % </p>
         <p> Green 81 - 100 %</p>
         <p> Blue > 100 % </p>
     </div>
-    <div class="center">
-        PONDERACIÓN DE RESULTADOS COMPETENCIAS Y OKRs
-        Total Ponderado: OKR  + Competencias
-        Escala:  81% - 100% Cumple con las expectativas
-        <div class="center">
-            <table class="center">
+        <h4>PONDERACIÓN DE RESULTADOS COMPETENCIAS Y OKRs</h4>
+        <p>Total Ponderado: OKR  + Competencias</p>
+        <p>Escala:  81% - 100% Cumple con las expectativas</p>
+
+        <div class="center-results">
+            <table>
                 <thead>
                 <tr>
-                    <th>Resultado de OKRs</th>
-                    <th>Autoevaluación Competencias</th>
-                    <th>Evaluación del equipo (Competencias)</th>
-                    <th>Total</th>
+                    <th class=".col-results">Resultado de OKRs</th>
+                    <th class=".col-results">Autoevaluación Competencias</th>
+                    <th class=".col-results">Evaluación del equipo (Competencias)</th>
+                    <th class=".col-results">Total</th>
                 </tr>
                 </thead>
                 <tr>
@@ -40,57 +43,96 @@
         </div>
     </div>
 
-<div class="graph" style="background-color: white">
-    <h1>Resultados por competencias</h1>
-    <center>
-        <canvas id="chart" width="400" height="400"></canvas>
-        <script>
-            // bar chart data
-            var barData = {
-                labels : [ {% for item in y_values %}
-                    "{{ item }}",
-                {% endfor %} ],
-                datasets : [{
-                fillColor: "purple",
-                strokeColor: "purple",
-                pointColor: "rgba(151,187,205,1)",
-                data : [ {% for item in x_values %}
-                        "{{ item }}",
-                    {% endfor %} ]
-                }],
-            }
-            // get bar chart canvas
-            var mychart = document.getElementById("chart").getContext("2d");
-            steps = 10
-            max = 100
-            // draw bar chart   https://www.sitepoint.com/fancy-responsive-charts-with-chart-js/
-            new Chart(mychart).Bar(barData, {
-                responsive: true,
-                scaleOverride: true,
-                scaleSteps: steps,
-                scaleStepWidth: Math.ceil(max / steps),
-                scaleStartValue: 0,
-                scaleShowVerticalLines: true,
-                scaleShowGridLines : true,
-                barShowStroke : true,
-                scaleShowLabels: true,
-                scaleFontSize : 12,
-                scaleLineColor : 'black',
-                scaleGridLineColor: 'gray',
-                pointDotRadius: 10,
-                bezierCurve: false,
-                tooltipTitleFontStyle : 'normal',
-                barThickness: 18,
+<div class="col-md-6 offset-md-3 my-5">
+    <div class="card graph">
+        <div class="card-body">
+            <p>Resultados por competencias</p>
+            <hr>
+        </div>
+
+        <div class="card-body">
+            <canvas id="myChart" width="250" height="150"></canvas>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create can be line, bar, horizontalBar, pie, radar, doughnut, polarArea ...
+            type: 'bar',    <!-- https://www.chartjs.org/docs/latest/getting-started/ -->
+
+            // The data for our dataset https://www.youtube.com/watch?v=B5rCrmXK5Y0
+            data: {
+                labels: [ {% for item in y_values %}
+                             "{{ item }}",
+                           {% endfor %} ],  // ['January', 'February', 'March', 'April', 'May', 'June', 'July']
+                datasets: [{
+                    label: 'Performance Review', //
+                    backgroundColor: 'rgb(128, 0, 128)', // if I want a color for each bar, i add  values as a matrix
+                    borderColor: 'indigo',
+                    borderWidth: 2, // width in pixels
+                    barThickness: 18,
+                    maxBarThickness: 30,
+                    data: [ {% for item in x_values %}
+                                "{{ item }}",
+                            {% endfor %} ]  // [0, 10, 5, 2, 20, 30, 45]
+                }]
+            },
+
+            // Configuration options go here
+            options: {
+                legend: {
+                    display: false,  // if true, it appears
+                    position: 'right', // default in the center
+                    labels: {
+                        // This more specific font property overrides the global property
+                        fontColor: 'red',
+                        fontSize: 12,
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 40,
+                        right: 50,
+                        bottom: 0,
+                        top: 0
+                    }
+                },
                 scales: {
-                      xAxes: [{
-                        maxBarThickness: 100,
-                      }],
-                }
-            });
-        </script>
-    </center>
+                    xAxes: [{
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 30,
+                            minRotation: 30,
+                            fontSize: 12,
+                            labelMaxWidth: 20,
+                        },
+                        gridLines: {
+                            offsetGridLines: true,
+                            drawOnChartArea: true,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: { display: false},
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 20
+                        },
+                    }]
+                },
+                //title: {
+                //    display: true,
+                //    text: 'Custom Chart Title'
+                //},
+            }
+        });
+    </script>
+    </div>
+
+    <div class="after-graph">
+        <br>
+    </div>
+
 </div>
-    <br>
-</div>
+
 
 {% endblock %}
